@@ -19,6 +19,7 @@ public:
     vector(size_type, const T&);
     explicit vector(size_type);
     vector(const vector<T>&);
+    vector(vector<T>&&);
     ~vector();
 
     size_type size() const;
@@ -71,12 +72,26 @@ vector<T>::vector(const vector<T>& other)
 
 
 template<typename T>
+vector<T>::vector(vector<T>&& other) 
+: m_elem{other.m_elem}
+, m_sz{other.m_sz}
+, m_capacity{other.m_capacity}
+{
+    other.m_elem=nullptr;
+    other.m_sz=other.m_capacity=0;
+}
+
+
+template<typename T>
 vector<T>::~vector()
 {
-    for (size_type i=0;i<m_sz;++i)
-        m_elem[i].~T();
-    
-    operator delete(m_elem);
+    if (m_elem)
+    {
+        for (size_type i=0;i<m_sz;++i)
+            m_elem[i].~T();
+        
+        operator delete(m_elem);
+    }
 }
 
 
