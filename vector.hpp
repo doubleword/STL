@@ -63,11 +63,15 @@ vector<T>::vector(size_type n)
 
 template<typename T>
 vector<T>::vector(const vector<T>& other)
-: m_elem{static_cast<T*>(operator new(other.m_capacity*sizeof(T)))}
+: m_elem{nullptr}
 , m_sz{other.m_sz}
 , m_capacity{other.m_capacity}
 {
-    for (size_type i=0;i<m_sz;++i) new (m_elem+i) T{other.m_elem[i]};
+    if (m_capacity>0)
+        m_elem=static_cast<T*>(operator new(m_capacity*sizeof(T)));
+    
+    if (m_sz>0)
+        for (size_type i=0;i<m_sz;++i) new (m_elem+i) T{other.m_elem[i]};
 }
 
 
