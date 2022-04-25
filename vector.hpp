@@ -23,10 +23,23 @@ public:
     vector(std::initializer_list<T>);
     ~vector();
 
-    size_type size() const;
-    size_type capacity() const;
-    T& operator[](size_type);
-    const T& operator[](size_type) const;
+    size_type size() const {return m_sz;}
+    size_type capacity() const {return m_capacity;}
+    
+    T& operator[](size_type i) {return m_elem[i];}
+    const T& operator[](size_type i) const {return m_elem[i];}
+
+    T* data() {return m_elem;}
+    const T* data() const {return m_elem;}
+    
+    T& front() {return m_elem[0];}
+    const T& front() const {return m_elem[0];}
+    
+    T& back() {return m_elem[m_sz-1];}
+    const T& back() const {return m_elem[m_sz-1];}
+    
+    T& at(size_type);
+    const T& at(size_type) const;
 
 private:
     T *m_elem;
@@ -118,18 +131,23 @@ vector<T>::~vector()
 }
 
 
-template<typename T>
-typename vector<T>::size_type vector<T>::size() const {return m_sz;}
+template <typename T>
+T& vector<T>::at(size_type pos)
+{
+    if (pos>=0 && pos<m_sz)
+        return m_elem[pos];
+    else
+        throw std::out_of_range{"Out of range access attempt"};
+}
 
-template<typename T>
-typename vector<T>::size_type vector<T>::capacity() const {return m_capacity;}
-
-template<typename T>
-T& vector<T>::operator[](size_type i) {return m_elem[i];}
-
-template<typename T>
-const T& vector<T>::operator[](size_type i) const {return m_elem[i];}
-
+template <typename T>
+const T& vector<T>::at(size_type pos) const 
+{
+    if (pos>=0 && pos<m_sz)
+        return m_elem[pos];
+    else
+        throw std::out_of_range{"Out of range access attempt"};    
+}
 
 
 }
