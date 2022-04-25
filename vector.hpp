@@ -1,7 +1,7 @@
 #pragma once
 
 #include <new>
-
+#include <iostream>
 
 namespace stl
 {
@@ -20,6 +20,7 @@ public:
     explicit vector(size_type);
     vector(const vector<T>&);
     vector(vector<T>&&);
+    vector(std::initializer_list<T>);
     ~vector();
 
     size_type size() const;
@@ -85,6 +86,24 @@ vector<T>::vector(vector<T>&& other)
     other.m_sz=other.m_capacity=0;
 }
 
+template<typename T>
+vector<T>::vector(std::initializer_list<T> vals)
+: m_elem{nullptr}
+, m_sz{vals.size()}
+, m_capacity{vals.size()}
+{
+
+    if (m_sz>0)
+    {
+        m_elem=static_cast<T*>( operator new(m_sz*sizeof(T)) );
+
+        const T *ptr=vals.begin();
+        for (size_type i=0;i<m_sz;++i)
+            new (m_elem+i) T{ptr[i]};
+
+
+    }
+}
 
 template<typename T>
 vector<T>::~vector()
