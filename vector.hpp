@@ -1,7 +1,8 @@
 #pragma once
 
 #include <new>
-#include <iostream>
+#include <utility>
+
 
 namespace stl
 {
@@ -22,6 +23,9 @@ public:
     vector(vector<T>&&);
     vector(std::initializer_list<T>);
     ~vector();
+
+    vector<T>& operator=(const vector<T>&);
+    vector<T>& operator=(vector<T>&&);
 
     size_type size() const {return m_sz;}
     size_type capacity() const {return m_capacity;}
@@ -129,6 +133,61 @@ vector<T>::~vector()
         operator delete(m_elem);
     }
 }
+
+
+template <typename T>
+vector<T>& vector<T>::operator=(const vector<T>& other)
+{
+
+    if (m_capacity>=other.m_sz)
+    {
+        
+        int k=std::max(m_sz,other.m_sz);
+        
+        for (size_type i=0;i<k;++i)
+        {
+            if (i<m_sz)
+                m_elem[i].~T();
+
+            if (i<other.m_sz)
+                new(m_elem+i) T{other.m_elem[i]};
+        }
+        
+        m_sz=other.m_sz;
+    }
+    else
+    {
+        vector<T> tmp{other};
+        *this=std::move(tmp);
+    
+    }
+    return *this;
+}
+
+
+template <typename T>
+vector<T>& vector<T>::operator=(vector<T>&& other)
+{
+
+    if (m_elem)
+    {
+        for (size_type i=0;i<m_sz;++i)
+            m_elem[i].~T();
+        
+        operator delete(m_elem);
+
+    }
+
+    m_elem=other.m_elem;
+    m_sz=other.m_sz;
+    m_capacity=other.m_capacity;
+
+    other.m_elem=nullptr;
+    other.m_sz=other.m_capacity=0;
+
+    return *this;
+}
+
 
 
 template <typename T>
