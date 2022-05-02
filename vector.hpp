@@ -45,6 +45,11 @@ public:
     T& at(size_type);
     const T& at(size_type) const;
 
+    void clear();
+
+    void push_back(const T&);
+    void pop_back() { if (m_sz>0) m_elem[--m_sz].~T(); };
+
 private:
     T *m_elem;
     size_type m_sz;
@@ -207,6 +212,59 @@ const T& vector<T>::at(size_type pos) const
     else
         throw std::out_of_range{"Out of range access attempt"};    
 }
+
+
+template <typename T>
+void vector<T>::clear()
+{
+    if (m_sz>0)
+    {
+        for (size_type i=0;i<m_sz;++i)
+            m_elem[i].~T();
+        
+        m_sz=0;
+    }
+
+}
+
+
+template <typename T>
+void vector<T>::push_back(const T& value)
+{
+
+    if (m_sz<m_capacity)
+    {
+        new (m_elem+m_sz) T{value};
+        ++m_sz;
+    }
+    else if (m_elem==nullptr)
+    {
+        m_elem=static_cast<T*>( operator new(sizeof(T)) );
+        new (m_elem) T{value};
+        m_sz=m_capacity=1;
+    }
+    else
+    {
+        T *ptr=static_cast<T*>( operator new(2*m_sz*sizeof(T)) );
+        for (size_type i=0; i<m_sz;++i)
+        {
+            new (ptr+i) T{ std::move(m_elem[i]) };
+            m_elem[i].~T();
+        }
+
+        new(ptr+m_sz) T{value};
+        m_capacity=2*m_sz;
+        ++m_sz;
+
+        operator delete(m_elem);
+        m_elem=ptr;
+    }
+
+
+}
+
+
+
 
 
 }
