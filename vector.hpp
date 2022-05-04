@@ -15,6 +15,8 @@ class vector
 public:
     using value_type=T;
     using size_type=unsigned long long;
+    using iterator=T*;
+    using const_iterator=const T*;
 
     vector();
     vector(size_type, const T&);
@@ -48,7 +50,12 @@ public:
     void clear();
 
     void push_back(const T&);
-    void pop_back() { if (m_sz>0) m_elem[--m_sz].~T(); };
+    void pop_back() { if (m_sz>0) m_elem[--m_sz].~T(); }
+
+    iterator begin() {return m_elem;}
+    iterator end() {return m_elem+m_sz;}
+    const_iterator cbegin() const {return m_elem;}
+    const_iterator cend() const {return m_elem+m_sz;}
 
 private:
     T *m_elem;
