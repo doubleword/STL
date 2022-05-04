@@ -264,6 +264,17 @@ void vector<T>::push_back(const T& value)
 }
 
 
+template<typename T>
+bool operator==(const vector<T>& lhs,const vector<T>& rhs)
+{
+
+    if (lhs.size()!=rhs.size()) return false;
+
+    for (typename vector<T>::size_type i=0; i<lhs.size();++i)
+        if (lhs[i]!=rhs[i]) return false;
+    
+    return true;
+}
 
 
 
