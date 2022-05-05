@@ -2,7 +2,7 @@
 
 #include <new>
 #include <utility>
-
+#include <iterator>
 
 namespace stl
 {
@@ -17,6 +17,8 @@ public:
     using size_type=unsigned long long;
     using iterator=T*;
     using const_iterator=const T*;
+    using reverse_iterator=typename std::reverse_iterator<iterator>;
+    using const_reverse_iterator=typename std::reverse_iterator<const_iterator>;
 
     vector();
     vector(size_type, const T&);
@@ -56,6 +58,12 @@ public:
     iterator end() {return m_elem+m_sz;}
     const_iterator cbegin() const {return m_elem;}
     const_iterator cend() const {return m_elem+m_sz;}
+
+    reverse_iterator rbegin() {return reverse_iterator{m_elem+m_sz};}
+    reverse_iterator rend() {return reverse_iterator{m_elem};};
+    const_reverse_iterator crbegin() const {return const_reverse_iterator{m_elem+m_sz};};
+    const_reverse_iterator crend() const {return const_reverse_iterator{m_elem};};
+
 
 private:
     T *m_elem;
