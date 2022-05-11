@@ -65,6 +65,10 @@ public:
     const_reverse_iterator crend() const {return const_reverse_iterator{m_elem};};
 
 
+    iterator erase(const_iterator,const_iterator);
+    iterator erase(const_iterator pos) {return erase(pos,pos+1);};    
+
+
 private:
     T *m_elem;
     size_type m_sz;
@@ -291,6 +295,32 @@ bool operator==(const vector<T>& lhs,const vector<T>& rhs)
     return true;
 }
 
+
+template<typename T>
+typename vector<T>::iterator vector<T>::erase(const_iterator first, const_iterator last)
+{
+
+    iterator a=const_cast<iterator>(first);
+    iterator b=const_cast<iterator>(last);
+    
+    const_iterator e=cend();
+
+    size_type i=0;
+    for (;a+i!=b;++i)
+        a[i].~T();
+
+    for (;b!=e;++b)
+    {
+        new (b-i) T{std::move(*b)};
+        b->~T();
+    }
+
+
+    m_sz-=last-first;
+
+    return a;
+
+}
 
 
 }
