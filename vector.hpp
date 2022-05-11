@@ -26,6 +26,8 @@ public:
     vector(const vector<T>&);
     vector(vector<T>&&);
     vector(std::initializer_list<T>);
+    template<typename InputIt>
+    vector(InputIt,InputIt);
     ~vector();
 
     vector<T>& operator=(const vector<T>&);
@@ -145,6 +147,37 @@ vector<T>::vector(std::initializer_list<T> vals)
 
     }
 }
+
+
+template<typename T>
+template<typename InputIt>
+vector<T>::vector(InputIt first,InputIt last)
+: m_elem{nullptr}
+, m_sz{0}
+, m_capacity{0}
+{
+    size_type sz=0;
+
+    InputIt it=first;
+    while (it++!=last) ++sz;
+
+    if (sz)
+    {
+        m_sz=m_capacity=sz;
+        m_elem=static_cast<T*>( operator new(m_sz*sizeof(T)) );
+        
+        size_type i=0;
+        while (first!=last)
+        {
+            new (m_elem+i) T{ static_cast<T>(*first) };
+            ++first;
+            ++i;
+        }
+
+    }
+
+}
+
 
 template<typename T>
 vector<T>::~vector()
