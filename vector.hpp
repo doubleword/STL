@@ -54,6 +54,7 @@ public:
     void clear();
 
     void push_back(const T&);
+    void push_back(T&& value);
     void pop_back() { if (m_sz>0) m_elem[--m_sz].~T(); }
 
     iterator begin() {return m_elem;}
@@ -286,7 +287,7 @@ void vector<T>::clear()
 template <typename T>
 void vector<T>::push_back(const T& value)
 {
-
+    
     if (m_sz<m_capacity)
     {
         new (m_elem+m_sz) T{value};
@@ -308,6 +309,42 @@ void vector<T>::push_back(const T& value)
         }
 
         new(ptr+m_sz) T{value};
+        m_capacity=2*m_sz;
+        ++m_sz;
+
+        operator delete(m_elem);
+        m_elem=ptr;
+    }
+
+
+}
+
+
+template <typename T>
+void vector<T>::push_back(T&& value)
+{
+    
+    if (m_sz<m_capacity)
+    {
+        new (m_elem+m_sz) T{std::move(value)};
+        ++m_sz;
+    }
+    else if (m_elem==nullptr)
+    {
+        m_elem=static_cast<T*>( operator new(sizeof(T)) );
+        new (m_elem) T{std::move(value)};
+        m_sz=m_capacity=1;
+    }
+    else
+    {
+        T *ptr=static_cast<T*>( operator new(2*m_sz*sizeof(T)) );
+        for (size_type i=0; i<m_sz;++i)
+        {
+            new (ptr+i) T{ std::move(m_elem[i]) };
+            m_elem[i].~T();
+        }
+
+        new(ptr+m_sz) T{std::move(value)};
         m_capacity=2*m_sz;
         ++m_sz;
 
