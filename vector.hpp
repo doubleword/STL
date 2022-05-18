@@ -70,6 +70,9 @@ public:
     iterator erase(const_iterator,const_iterator);
     iterator erase(const_iterator pos) {return erase(pos,pos+1);};    
 
+    template<typename ...Args>
+    T& emplace_back(Args&&...);
+
 
 private:
     T *m_elem;
@@ -354,6 +357,44 @@ typename vector<T>::iterator vector<T>::erase(const_iterator first, const_iterat
     return a;
 
 }
+
+
+template<typename T>
+template<typename... Args>
+T& vector<T>::emplace_back(Args&&... args)
+{
+    
+    if (m_sz<m_capacity)
+    {
+        new (m_elem+m_sz) T{std::forward<Args>(args)...};
+        ++m_sz;
+    }
+    else if (m_elem==nullptr)
+    {
+        m_elem=static_cast<T*>( operator new(sizeof(T)) );
+        new (m_elem) T{std::forward<Args>(args)...};
+        m_sz=m_capacity=1;
+    }
+    else
+    {
+        T *ptr=static_cast<T*>( operator new(2*m_sz*sizeof(T)) );
+        for (size_type i=0; i<m_sz;++i)
+        {
+            new (ptr+i) T{ std::move(m_elem[i]) };
+            m_elem[i].~T();
+        }
+
+        new(ptr+m_sz) T{std::forward<Args>(args)...};
+        m_capacity=2*m_sz;
+        ++m_sz;
+
+        operator delete(m_elem);
+        m_elem=ptr;
+    }
+
+    return *(m_elem+m_sz-1);
+}
+
 
 
 }
